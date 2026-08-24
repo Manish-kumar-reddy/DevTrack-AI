@@ -1,0 +1,1 @@
+import{E as t}from"./index-CztS19yB.js";const n=()=>t.get("/analytics/summary").then(a=>a.data),m=()=>t.get("/analytics/charts").then(a=>a.data),c=a=>t.get("/analytics/heatmap",{params:{year:a}}).then(s=>s.data);export{c as a,m as b,n as g};
