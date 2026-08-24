@@ -7,10 +7,12 @@ const goalRoutes = require("./goalRoutes");
 const analyticsRoutes = require("./analyticsRoutes");
 const aiRoutes = require("./aiRoutes");
 const resumeRoutes = require("./resumeRoutes");
-const achievementRoutes = require("./achievementRoutes"); // NEW
+const revisionRoutes = require("./revisionRoutes");
+const achievementRoutes = require("./achievementRoutes");
 
 const router = express.Router();
 
+router.get("/health", (req, res) => res.json({ status: "ok" }));
 router.use("/auth", authRoutes);
 router.use("/problems", problemRoutes);
 router.use("/contests", contestRoutes);
@@ -18,6 +20,7 @@ router.use("/goals", goalRoutes);
 router.use("/analytics", analyticsRoutes);
 router.use("/ai", aiRoutes);
 router.use("/resume", resumeRoutes);
-router.use("/achievements", achievementRoutes); // NEW
+router.use("/revisions", revisionRoutes);
+router.use("/achievements", achievementRoutes);
 
 module.exports = router;
