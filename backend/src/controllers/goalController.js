@@ -1,34 +1,8 @@
-const { Op } = require("sequelize");
-const { Goal, Problem } = require("../models");
+const { Goal } = require("../models");
 const ApiError = require("../utils/ApiError");
 const asyncHandler = require("../utils/asyncHandler");
-const { computeCurrentStreak, toDateOnly } = require("../utils/streak");
-
-async function withProgress(goal, userId) {
-  const where = {
-    userId,
-    status: "Solved",
-    solvedDate: { [Op.between]: [goal.startDate, goal.endDate] },
-  };
-  if (goal.targetTopic) where.topic = goal.targetTopic;
-
-  const solvedCount = await Problem.count({ where });
-  const completionPercent = Math.min(100, Math.round((solvedCount / goal.targetCount) * 100));
-  const remaining = Math.max(0, goal.targetCount - solvedCount);
-  const today = toDateOnly(new Date());
-  const isExpired = today > goal.endDate && solvedCount < goal.targetCount;
-
-  return {
-    ...goal.toJSON(),
-    progress: {
-      solvedCount,
-      remaining,
-      completionPercent,
-      isComplete: solvedCount >= goal.targetCount,
-      isExpired,
-    },
-  };
-}
+const { computeCurrentStreak } = require("../utils/streak");
+const { withProgress } = require("../utils/goalProgress");
 
 const listGoals = asyncHandler(async (req, res) => {
   const { period } = req.query;

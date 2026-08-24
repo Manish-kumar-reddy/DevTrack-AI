@@ -7,6 +7,7 @@ const PERIOD_COLORS = {
 };
 
 export default function GoalCard({ goal, onEdit, onDelete }) {
+  const showActions = Boolean(onEdit || onDelete);
   const { progress } = goal;
   const barColor = progress.isComplete ? "bg-emerald-500" : progress.isExpired ? "bg-red-400" : "bg-brand-500";
 
@@ -43,14 +44,20 @@ export default function GoalCard({ goal, onEdit, onDelete }) {
         <span>
           {goal.startDate} → {goal.endDate}
         </span>
-        <div className="flex gap-3">
-          <button className="hover:text-brand-600 dark:hover:text-brand-400" onClick={() => onEdit(goal)}>
-            Edit
-          </button>
-          <button className="hover:text-red-500" onClick={() => onDelete(goal)}>
-            Delete
-          </button>
-        </div>
+        {showActions && (
+          <div className="flex gap-3">
+            {onEdit && (
+              <button className="hover:text-brand-600 dark:hover:text-brand-400" onClick={() => onEdit(goal)}>
+                Edit
+              </button>
+            )}
+            {onDelete && (
+              <button className="hover:text-red-500" onClick={() => onDelete(goal)}>
+                Delete
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </motion.div>
   );

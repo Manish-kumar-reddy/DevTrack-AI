@@ -7,6 +7,12 @@ export const updateProblem = (id, payload) => client.put(`/problems/${id}`, payl
 export const deleteProblem = (id) => client.delete(`/problems/${id}`);
 export const toggleFavorite = (id) => client.post(`/problems/${id}/favorite`).then((r) => r.data);
 
+export const fetchProblemFromUrl = (url) => client.post("/problems/fetch", { url }).then((r) => r.data);
+export const bulkImportProblems = (urls) => client.post("/problems/bulk-import", { urls }).then((r) => r.data);
+
+export const getProblemNote = (id) => client.get(`/problems/${id}/note`).then((r) => r.data);
+export const upsertProblemNote = (id, payload) => client.put(`/problems/${id}/note`, payload).then((r) => r.data);
+
 export const PLATFORMS = ["LeetCode", "GeeksforGeeks", "HackerRank", "CodeForces", "CodeChef", "Other"];
 export const DIFFICULTIES = ["Easy", "Medium", "Hard"];
 export const STATUSES = ["Todo", "Attempted", "Solved"];

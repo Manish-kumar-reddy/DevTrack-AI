@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { to: "/analytics", label: "Analytics", icon: "📊" },
   { to: "/ai-planner", label: "AI Study Planner", icon: "✨" },
   { to: "/resume", label: "Resume Mode", icon: "📄" },
+  { to: "/achievements", label: "Achievements", icon: "🎖️" },
 ];
 
 export default function Sidebar({ open, onClose }) {

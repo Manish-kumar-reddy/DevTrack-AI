@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Modal from "../ui/Modal";
-import { PLATFORMS, DIFFICULTIES, STATUSES } from "../../api/problems";
+import { PLATFORMS, DIFFICULTIES, STATUSES, fetchProblemFromUrl } from "../../api/problems";
 
 const EMPTY_FORM = {
   title: "",
@@ -11,15 +11,27 @@ const EMPTY_FORM = {
   notes: "",
   solvedDate: "",
   timeSpentMinutes: "",
+  sourceUrl: "",
+  sourceSlug: "",
 };
 
 export default function ProblemFormModal({ open, onClose, onSubmit, initial, saving }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
 
+  // Quick Add from URL -- only offered when creating a new problem, since
+  // editing an existing entry already has real data to work from.
+  const [urlInput, setUrlInput] = useState("");
+  const [fetching, setFetching] = useState(false);
+  const [fetchError, setFetchError] = useState(null);
+  const [fetchNotice, setFetchNotice] = useState(null);
+
   useEffect(() => {
     if (open) {
       setErrors({});
+      setUrlInput("");
+      setFetchError(null);
+      setFetchNotice(null);
       setForm(
         initial
           ? {
@@ -31,11 +43,39 @@ export default function ProblemFormModal({ open, onClose, onSubmit, initial, sav
               notes: initial.notes || "",
               solvedDate: initial.solvedDate || "",
               timeSpentMinutes: initial.timeSpentMinutes ?? "",
+              sourceUrl: initial.sourceUrl || "",
+              sourceSlug: initial.sourceSlug || "",
             }
           : EMPTY_FORM
       );
     }
   }, [open, initial]);
+
+  async function handleFetchDetails() {
+    if (!urlInput.trim()) return;
+    setFetching(true);
+    setFetchError(null);
+    setFetchNotice(null);
+    try {
+      const details = await fetchProblemFromUrl(urlInput.trim());
+      setForm((prev) => ({
+        ...prev,
+        title: details.title ?? prev.title,
+        platform: details.platform ?? prev.platform,
+        difficulty: details.difficulty ?? prev.difficulty,
+        topic: details.topic ?? prev.topic,
+        sourceUrl: urlInput.trim(),
+        sourceSlug: details.sourceSlug ?? "",
+      }));
+      if (details.partial) {
+        setFetchNotice(details.partialReason || "Only some details could be auto-filled -- please review.");
+      }
+    } catch (err) {
+      setFetchError(err.response?.data?.message || "Could not fetch problem details. Please enter them manually.");
+    } finally {
+      setFetching(false);
+    }
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -44,6 +84,8 @@ export default function ProblemFormModal({ open, onClose, onSubmit, initial, sav
       ...form,
       solvedDate: form.solvedDate || null,
       timeSpentMinutes: form.timeSpentMinutes === "" ? null : Number(form.timeSpentMinutes),
+      sourceUrl: form.sourceUrl || null,
+      sourceSlug: form.sourceSlug || null,
     };
     try {
       await onSubmit(payload);
@@ -56,6 +98,30 @@ export default function ProblemFormModal({ open, onClose, onSubmit, initial, sav
   return (
     <Modal open={open} onClose={onClose} title={initial ? "Edit Problem" : "Add Problem"} wide>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {!initial && (
+          <div className="rounded-xl border border-dashed border-brand-300 dark:border-brand-500/30 bg-brand-50/50 dark:bg-brand-500/5 p-3.5 space-y-2">
+            <label className="label !mb-1">Paste Problem URL</label>
+            <div className="flex gap-2">
+              <input
+                className="input"
+                value={urlInput}
+                onChange={(e) => setUrlInput(e.target.value)}
+                placeholder="https://leetcode.com/problems/... OR https://geeksforgeeks.org/problems/..."
+              />
+              <button
+                type="button"
+                className="btn-secondary shrink-0"
+                onClick={handleFetchDetails}
+                disabled={fetching || !urlInput.trim()}
+              >
+                {fetching ? "Fetching..." : "Fetch Details"}
+              </button>
+            </div>
+            {fetchError && <p className="text-xs text-red-500">{fetchError}</p>}
+            {fetchNotice && <p className="text-xs text-amber-600 dark:text-amber-400">⚠️ {fetchNotice}</p>}
+          </div>
+        )}
+
         <div>
           <label className="label">Title</label>
           <input

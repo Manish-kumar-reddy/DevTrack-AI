@@ -55,6 +55,21 @@ Problem.init(
       allowNull: true,
       field: "time_spent_minutes",
     },
+    sourceUrl: {
+      type: DataTypes.STRING(500),
+      allowNull: true,
+      field: "source_url",
+    },
+    sourceSlug: {
+      // Set only when a problem was created via "Quick Add from URL" or
+      // Bulk Import -- lets bulk import detect duplicates (same user +
+      // platform + slug) without relying on fuzzy title matching. NULL for
+      // manually-entered problems, which never collide with each other:
+      // MySQL treats multiple NULLs in a unique index as distinct.
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      field: "source_slug",
+    },
   },
   {
     sequelize,
@@ -66,6 +81,7 @@ Problem.init(
       { fields: ["user_id", "status"] },
       { fields: ["user_id", "topic"] },
       { fields: ["user_id", "difficulty"] },
+      { unique: true, fields: ["user_id", "platform", "source_slug"] },
     ],
   }
 );

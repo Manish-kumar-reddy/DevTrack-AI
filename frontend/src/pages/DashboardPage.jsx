@@ -1,23 +1,32 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { getSummary } from "../api/analytics";
+import { getSummary, getWidgets } from "../api/analytics";
 import { useAuth } from "../context/AuthContext";
 import StatCard from "../components/dashboard/StatCard";
+import TodaysRevisionCard from "../components/dashboard/TodaysRevisionCard";
+import TopicInsightCard from "../components/dashboard/TopicInsightCard";
+import RecentlySolvedCard from "../components/dashboard/RecentlySolvedCard";
+import UpcomingRevisionsCard from "../components/dashboard/UpcomingRevisionsCard";
+import GoalCard from "../components/goals/GoalCard";
 import { CardSkeleton } from "../components/ui/Skeleton";
 import ErrorState from "../components/ui/ErrorState";
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const [summary, setSummary] = useState(null);
+  const [widgets, setWidgets] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   function load() {
     setLoading(true);
     setError(null);
-    getSummary()
-      .then(({ data }) => setSummary(data))
+    Promise.all([getSummary(), getWidgets()])
+      .then(([summaryRes, widgetsRes]) => {
+        setSummary(summaryRes.data);
+        setWidgets(widgetsRes.data);
+      })
       .catch((err) => setError(err.response?.data?.message || "Failed to load dashboard."))
       .finally(() => setLoading(false));
   }
@@ -102,6 +111,26 @@ export default function DashboardPage() {
               </div>
             )}
           </motion.div>
+
+          {widgets && (
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <TodaysRevisionCard />
+              <TopicInsightCard strongestTopic={widgets.strongestTopic} weakestTopic={widgets.weakestTopic} />
+              <UpcomingRevisionsCard revisions={widgets.upcomingRevisions} />
+              <RecentlySolvedCard problems={widgets.recentlySolved} />
+
+              {widgets.todaysGoalProgress.length > 0 && (
+                <div className="lg:col-span-2 space-y-3">
+                  <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Today's Goal Progress</h2>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {widgets.todaysGoalProgress.map((g) => (
+                      <GoalCard key={g.id} goal={g} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </>
       )}
     </div>

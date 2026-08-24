@@ -3,6 +3,8 @@ import toast from "react-hot-toast";
 import * as problemsApi from "../api/problems";
 import { PLATFORMS, DIFFICULTIES, STATUSES } from "../api/problems";
 import ProblemFormModal from "../components/problems/ProblemFormModal";
+import BulkImportModal from "../components/problems/BulkImportModal";
+import ProblemNotesModal from "../components/problems/ProblemNotesModal";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
 import EmptyState from "../components/ui/EmptyState";
 import ErrorState from "../components/ui/ErrorState";
@@ -28,6 +30,8 @@ export default function ProblemsPage() {
   const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [bulkImportOpen, setBulkImportOpen] = useState(false);
+  const [notesTarget, setNotesTarget] = useState(null);
 
   function load() {
     setLoading(true);
@@ -113,15 +117,20 @@ export default function ProblemsPage() {
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Problem Tracker</h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{pagination.total} problems tracked</p>
         </div>
-        <button
-          className="btn-primary"
-          onClick={() => {
-            setEditing(null);
-            setModalOpen(true);
-          }}
-        >
-          + Add Problem
-        </button>
+        <div className="flex gap-2">
+          <button className="btn-secondary" onClick={() => setBulkImportOpen(true)}>
+            ⬆ Bulk Import
+          </button>
+          <button
+            className="btn-primary"
+            onClick={() => {
+              setEditing(null);
+              setModalOpen(true);
+            }}
+          >
+            + Add Problem
+          </button>
+        </div>
       </div>
 
       <div className="card flex flex-wrap items-center gap-3">
@@ -227,6 +236,11 @@ export default function ProblemsPage() {
                     <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{p.solvedDate || "—"}</td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-2">
+                        {p.status === "Solved" && (
+                          <button className="btn-ghost px-2.5 py-1 text-xs" onClick={() => setNotesTarget(p)}>
+                            Notes
+                          </button>
+                        )}
                         <button
                           className="btn-ghost px-2.5 py-1 text-xs"
                           onClick={() => {
@@ -288,6 +302,10 @@ export default function ProblemsPage() {
         onCancel={() => setDeleteTarget(null)}
         confirming={deleting}
       />
+
+      <BulkImportModal open={bulkImportOpen} onClose={() => setBulkImportOpen(false)} onImported={load} />
+
+      <ProblemNotesModal open={Boolean(notesTarget)} onClose={() => setNotesTarget(null)} problem={notesTarget} />
     </div>
   );
 }

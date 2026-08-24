@@ -17,6 +17,7 @@ const AnalyticsPage = lazy(() => import("./pages/AnalyticsPage"));
 const AIStudyPlannerPage = lazy(() => import("./pages/AIStudyPlannerPage"));
 const ResumePage = lazy(() => import("./pages/ResumePage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 
 function PageFallback() {
   return (
@@ -50,6 +51,7 @@ export default function App() {
                 <Route path="/analytics" element={<AnalyticsPage />} />
                 <Route path="/ai-planner" element={<AIStudyPlannerPage />} />
                 <Route path="/resume" element={<ResumePage />} />
+                <Route path="/achievements" element={<AchievementsPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
               </Route>
               <Route path="*" element={<NotFoundPage />} />
