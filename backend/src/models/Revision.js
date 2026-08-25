@@ -27,7 +27,7 @@ Revision.init(
       field: "problem_id",
     },
     intervalDays: {
-      type: DataTypes.TINYINT.UNSIGNED,
+      type: DataTypes.SMALLINT.UNSIGNED,
       allowNull: false,
       field: "interval_days",
     },
