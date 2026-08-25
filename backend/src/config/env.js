@@ -1,8 +1,8 @@
 require("dotenv").config();
 
-function required(name, fallback) {
-  const value = process.env[name] ?? fallback;
-  if (value === undefined) {
+function required(name) {
+  const value = process.env[name];
+  if (!value) {
     throw new Error(`Missing required environment variable: ${name}`);
   }
   return value;
@@ -14,13 +14,7 @@ const env = {
   jwtSecret: required("JWT_SECRET"),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || "7d",
   corsOrigin: process.env.CORS_ORIGIN || "http://localhost:5173",
-  db: {
-    host: required("DB_HOST", "127.0.0.1"),
-    port: parseInt(process.env.DB_PORT || "3306", 10),
-    name: required("DB_NAME"),
-    user: required("DB_USER"),
-    password: process.env.DB_PASSWORD ?? "",
-  },
+  databaseUrl: required("DATABASE_URL"),
 };
 
 module.exports = env;
