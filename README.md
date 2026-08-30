@@ -133,3 +133,10 @@ What I could **not** verify in this environment: actual browser rendering/intera
 ## License
 
 MIT
+
+## Latest Update
+
+- Fixed PostgreSQL compatibility for the Analytics dashboard.
+- Replaced MySQL `DATE_FORMAT()` with PostgreSQL `TO_CHAR()`.
+- Monthly trend charts are now fully compatible with Neon PostgreSQL.
+
