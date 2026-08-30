@@ -77,7 +77,9 @@ const getCharts = asyncHandler(async (req, res) => {
       Problem.findAll({
         where: { userId, status: "Solved", solvedDate: { [Op.not]: null } },
         attributes: [
-          [fn("DATE_FORMAT", col("solved_date"), "%Y-%m"), "month"],
+          // DATE_FORMAT is MySQL-only -- TO_CHAR is the Postgres equivalent now that
+          // this app runs on Neon. Same "YYYY-MM" grouping, just Postgres syntax.
+          [fn("TO_CHAR", col("solved_date"), "YYYY-MM"), "month"],
           [fn("COUNT", col("id")), "count"],
         ],
         group: [literal("month")],
