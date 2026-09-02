@@ -1,5 +1,7 @@
 # DevTrack AI
 
+[![CI](https://github.com/Manish-kumar-reddy/DevTrack-AI/actions/workflows/ci.yml/badge.svg)](https://github.com/Manish-kumar-reddy/DevTrack-AI/actions/workflows/ci.yml)
+
 **AI-Powered Developer Productivity Platform** -- track coding practice, contest history, and interview prep goals; get a personalized DSA roadmap from a rule-based AI planner; visualize progress with real analytics; and auto-generate a portfolio summary from your own tracked data.
 
 Full-stack: **React 19 + Vite + Tailwind** frontend, **Node.js + Express + Sequelize + MySQL** backend, **JWT** auth.
@@ -29,6 +31,23 @@ Full-stack: **React 19 + Vite + Tailwind** frontend, **Node.js + Express + Seque
 | **Frontend** | React 19, Vite, Tailwind CSS, React Router 7, Axios, Recharts, Framer Motion, jsPDF |
 | **Backend** | Node.js, Express, Sequelize ORM, MySQL 8, JWT, bcrypt, express-validator |
 | **Infra** | Docker Compose (local), Render (backend), Vercel (frontend) |
+
+---
+
+## CI/CD
+
+[![CI](https://github.com/Manish-kumar-reddy/DevTrack-AI/actions/workflows/ci.yml/badge.svg)](https://github.com/Manish-kumar-reddy/DevTrack-AI/actions/workflows/ci.yml)
+
+A GitHub Actions workflow ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs on every push and every pull request targeting `main`:
+
+| Job | What it does |
+|---|---|
+| `backend` | Node.js 20 · `npm ci` in `backend/` |
+| `frontend` | Node.js 20 · `npm ci` in `frontend/` · `npm run build` |
+
+Both jobs run in parallel and fail the workflow the moment any step exits non-zero -- GitHub Actions' default behavior, no extra configuration needed. This catches a broken dependency install or a broken production build (`vite build`) before it reaches `main`.
+
+There is no backend test step yet -- `jest`/`supertest` are already installed as devDependencies, but no test files exist in `backend/` yet. Adding real tests there is the natural next step to extend this pipeline.
 
 ---
 
